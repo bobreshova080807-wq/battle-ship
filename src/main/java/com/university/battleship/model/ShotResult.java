@@ -1,4 +1,4 @@
-package model;
+package com.university.battleship.model;
 
 public enum ShotResult {
 
