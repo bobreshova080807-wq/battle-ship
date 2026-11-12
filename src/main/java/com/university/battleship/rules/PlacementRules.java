@@ -1,4 +1,4 @@
-package rules;
+package com.university.battleship.rules;
 
 import com.university.battleship.model.Coordinate;
 import com.university.battleship.model.Ship;

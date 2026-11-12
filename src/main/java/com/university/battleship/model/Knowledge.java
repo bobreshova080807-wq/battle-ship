@@ -1,13 +1,14 @@
 package com.university.battleship.model;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class Knowledge {
     private final Map<Coordinate, CellState> cells;
 
     public Knowledge(){
-        this.cells = new EnumMap<>(Map.class);
+        this.cells = new HashMap<>();
 
         for (int r = 0; r < Coordinate.BOARD_SIZE; r++){
             for (int c = 0; c < Coordinate.BOARD_SIZE; c++){

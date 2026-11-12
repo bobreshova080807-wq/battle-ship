@@ -1,4 +1,4 @@
-package strategy;
+package com.university.battleship.strategy;
 
 import com.university.battleship.model.Coordinate;
 import com.university.battleship.model.Knowledge;

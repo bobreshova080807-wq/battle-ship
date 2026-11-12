@@ -1,6 +1,7 @@
 package com.university.battleship.model;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class Board {
@@ -9,7 +10,7 @@ public final class Board {
 
     public Board(Fleet fleet){
         this.fleet = fleet;
-        this.cells = new EnumMap<>(Map.class);
+        this.cells = new HashMap<>();
 
         for (int r = 0; r < Coordinate.BOARD_SIZE; r++){
             for (int c = 0; c < Coordinate.BOARD_SIZE; c++){
@@ -34,7 +35,7 @@ public final class Board {
 
     }
 
-    public CellState getState(CellState coord){
+    public CellState getState(Coordinate coord){
         return cells.getOrDefault(coord, CellState.WATER);
     }
 
@@ -42,7 +43,7 @@ public final class Board {
         return fleet;
     }
 
-    void updateCell(Coordinate coord, CellState newState){
+    public void updateCell(Coordinate coord, CellState newState){
         cells.put(coord, newState);
     }
 }

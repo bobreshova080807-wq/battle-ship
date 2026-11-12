@@ -8,7 +8,7 @@ public final class Fleet{
     private final List<Ship> ships;
     private final List<Mine> mines;
 
-    private Fleet(List<Ship> ships, List<Mine> mines){
+    public Fleet(List<Ship> ships, List<Mine> mines){
         this.ships = new ArrayList<>(ships);
         this.mines = new ArrayList<>(mines);
     }
