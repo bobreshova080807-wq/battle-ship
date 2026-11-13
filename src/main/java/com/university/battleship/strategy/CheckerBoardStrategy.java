@@ -5,16 +5,29 @@ import com.university.battleship.model.Knowledge;
 
 import java.util.Random;
 
+/**
+ * Стратегия стрельбы в шахматном порядке.
+ *
+ * <p>Сначала обстреливает клетки, где (row+col) чётное, потом нечётное.
+ * Эффективнее случайной: минимальное число выстрелов для поиска кораблей
+ * (теоретически достаточно 50 выстрелов для поиска всех кораблей).
+ */
 public final class CheckerBoardStrategy implements ShotStrategy {
     private final Random random;
     private boolean evenPhase = true;
 
+    /**
+     * Создаёт стратегию с заданным генератором случайных чисел.
+     *
+     * @param random генератор случайных чисел
+     */
     public CheckerBoardStrategy(Random random){
         this.random = random;
     }
 
     @Override
     public Coordinate chooseShot(Knowledge knowledge){
+        // Сначала чётные клетки
         for (int i = 0; i < 1000; i++){
             int row = random.nextInt(Coordinate.BOARD_SIZE);
             int col = random.nextInt(Coordinate.BOARD_SIZE);
@@ -26,6 +39,7 @@ public final class CheckerBoardStrategy implements ShotStrategy {
                 }
             }
         }
+        // Если все чётные обстреляны — переходим к нечётным
         while (true){
             int row = random.nextInt(Coordinate.BOARD_SIZE);
             int col = random.nextInt(Coordinate.BOARD_SIZE);

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Тесты для правил расстановки.
  */
-class PlacementRuleTest {
+class PlacementRulesTest {
 
     @Test
     void canPlace_singleShipOnEmptyBoard_returnsTrue() {

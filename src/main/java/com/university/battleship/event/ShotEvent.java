@@ -3,6 +3,15 @@ package com.university.battleship.event;
 import com.university.battleship.model.ShotResult;
 import com.university.battleship.model.Coordinate;
 
+/**
+ * Событие выстрела.
+ *
+ * <p>Записывает результат выстрела: промах, попадание, потопление, мина и т.д.
+ *
+ * @param playerName имя игрока, который стрелял
+ * @param coord      координаты выстрела
+ * @param shotResult результат выстрела
+ */
 public record ShotEvent(String playerName, Coordinate coord, ShotResult shotResult)
         implements GameEvent{
     @Override

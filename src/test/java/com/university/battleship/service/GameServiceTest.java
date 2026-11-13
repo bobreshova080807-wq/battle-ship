@@ -19,6 +19,15 @@ class GameServiceTest {
     private Player player1;
     private Player player2;
 
+    /**
+     * Подготовка тестового окружения перед каждым тестом.
+     *
+     * <p>Создаёт два игрока с случайными флотами (3 мины у каждого)
+     * и сервис игры. Использует фиксированное зерно Random(42)
+     * для воспроизводимости результатов.
+     *
+     * @see BeforeEach
+     */
     @BeforeEach
     void setUp() {
         Random random = new Random(42);

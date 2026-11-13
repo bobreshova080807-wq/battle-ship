@@ -12,7 +12,24 @@ import com.university.battleship.strategy.SmartStrategy;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Демонстрационное приложение "Морской бой".
+ *
+ * <p>Показывает:
+ * <ul>
+ *   <li>Генерацию флота с минами</li>
+ *   <li>Игру между двумя ботами с разными стратегиями</li>
+ *   <li>Журнал событий</li>
+ * </ul>
+ *
+ * <p>Использует фиксированное зерно генератора случайных чисел для воспроизводимости.
+ */
 public class Demo {
+    /**
+     * Точка входа в приложение.
+     *
+     * @param args аргументы командной строки (не используются)
+     */
     public static void main(String[] args) {
         System.out.println("**** МОРСКОЙ БОЙ (ДЕМО) ****");
 
@@ -66,6 +83,7 @@ public class Demo {
 
             allShots++;
 
+            // Проверяем попадание и меняем игрока (если промах)
             boolean hit = events.stream()
                     .filter(e -> e instanceof ShotEvent)
                     .map(e -> (ShotEvent) e)
@@ -82,6 +100,7 @@ public class Demo {
                 opponentStrategy = tempStrategy;
             }
 
+            // Проверяем победителя
             String winner = gameService.checkWinner(current, opponent);
             System.out.println("ПОБЕДИТЕЛЬ: " + winner);
             System.out.println("Всего было ходов: " + turn);
