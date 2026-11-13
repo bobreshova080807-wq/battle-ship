@@ -5,11 +5,17 @@ import com.university.battleship.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public final class GameService {
 
+    private Random random;
 
-    public List<GameEvent> appleShot(Player shooter, Player victim, Coordinate coord){
+    public GameService(Random random) {
+        this.random = random;
+    }
+
+    public List<GameEvent> applyShot(Player shooter, Player victim, Coordinate coord){
         List<GameEvent> events = new ArrayList<>();
 
         if(shooter.knowledge().isShot(coord)){
@@ -30,6 +36,11 @@ public final class GameService {
             }
             case SHIP, MINESWEEPER -> {
                 Ship ship = victimBoard.getFleet().getShipAt(coord);
+                if (ship == null){
+                    result = ShotResult.MISS;
+                    victimBoard.updateCell(coord, CellState.MISS);
+                    shooter.knowledge().update(coord, CellState.MISS);
+                }
                 boolean sunk = ship.hit(coord);
 
                 if (sunk){
@@ -82,7 +93,7 @@ public final class GameService {
 
         for (Coordinate cell: area){
             Ship ship = victim.fleet().getShipAt(cell);
-            if (ship != null || !ship.isSunk()){
+            if ((ship != null) && !ship.isSunk()){
                 boolean sunk = ship.hit(cell);
                 victim.board().updateCell(cell, sunk ? CellState.SUNK : CellState.HIT);
                 shooter.board().updateCell(cell, sunk ? CellState.SUNK : CellState.HIT);

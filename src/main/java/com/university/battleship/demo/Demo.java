@@ -18,7 +18,7 @@ public class Demo {
 
         Random random = new Random(42);
 
-        GameService gameService = new GameService();
+        GameService gameService = new GameService(random);
         FleetGenerator fleetGenerator = new FleetGenerator(random);
 
         Fleet fleet1 = fleetGenerator.generate(5);
@@ -57,7 +57,7 @@ public class Demo {
 
             Coordinate shot = currentStrategy.chooseShot(current.knowledge());
 
-            List<GameEvent> events = gameService.appleShot(current, opponent, shot);
+            List<GameEvent> events = gameService.applyShot(current, opponent, shot);
 
             for (GameEvent event: events){
                 System.out.println(" " + event.describe());
