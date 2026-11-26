@@ -24,30 +24,35 @@ public final class PlacementRules {
 
     /**
      * Проверяет, можно ли разместить корабль на поле.
-     *
-     * @param ship          корабль для размещения
-     * @param existingShips уже размещённые корабли
-     * @return true, если размещение допустимо
+     * Подлодки могут касаться других кораблей.
+     * Тральщики не должны касаться кораблей, мин и других тральщиков.
      */
-    public static boolean canPlace(Ship ship, List<Ship> existingShips){
-        for (Coordinate cell: ship.getCells()){
-            // Проверка выхода за пределы
-            if (cell.row() < 0 || cell.col() >= Coordinate.BOARD_SIZE ||
-                cell.col() < 0 || cell.col() >= Coordinate.BOARD_SIZE){
+    public static boolean canPlace(Ship ship, List<Ship> existingShips) {
+        for (Coordinate cell : ship.getCells()) {
+            if (cell.row() < 0 || cell.row() >= Coordinate.BOARD_SIZE
+                    || cell.col() < 0 || cell.col() >= Coordinate.BOARD_SIZE) {
                 return false;
             }
 
-            // Проверка пересечения и касания
-            for (Ship existing: existingShips){
-                for (Coordinate existingCells: existing.getCells()){
-                    if (isTouching(cell, existingCells)){
+            if (ship.getType().isSubmarine()) {
+                // Подлодка: только проверка пересечения (не касания)
+                for (Ship existing : existingShips) {
+                    if (existing.getCells().contains(cell)) {
                         return false;
+                    }
+                }
+            } else {
+                // Обычные корабли и тральщики: проверка пересечения и касания
+                for (Ship existing : existingShips) {
+                    for (Coordinate existingCell : existing.getCells()) {
+                        if (isTouching(cell, existingCell)) {
+                            return false;
+                        }
                     }
                 }
             }
         }
         return true;
-
     }
 
     /**

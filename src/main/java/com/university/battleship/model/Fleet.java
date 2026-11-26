@@ -1,8 +1,6 @@
 package com.university.battleship.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Флот игрока — набор кораблей и мин.
@@ -13,6 +11,7 @@ import java.util.List;
 public final class Fleet{
     private final List<Ship> ships;
     private final List<Mine> mines;
+    private final Set<Coordinate> revealedMines;
 
     /**
      * Создаёт флот из списка кораблей и мин.
@@ -23,6 +22,7 @@ public final class Fleet{
     public Fleet(List<Ship> ships, List<Mine> mines){
         this.ships = new ArrayList<>(ships);
         this.mines = new ArrayList<>(mines);
+        this.revealedMines = new HashSet<>();
     }
 
     /**
@@ -97,5 +97,38 @@ public final class Fleet{
      */
     public int getSunkCellsCount(){
         return ships.stream().filter(Ship::isSunk).mapToInt(ship -> ship.getType().getSize()).sum();
+    }
+
+    /**
+     * Возвращает true, если мина по данной координате уже была выдана противнику.
+     */
+    public boolean isMineRevealed(Coordinate coord) {
+        return revealedMines.contains(coord);
+    }
+
+    /**
+     * Возвращает координату одной из активных (не взорванных и не выданных) мин.
+     * Помечает её как выданную.
+     *
+     * @return координата выданной мины, или empty, если активных мин нет
+     */
+    public Optional<Coordinate> revealOneMine() {
+        for (Mine mine : mines) {
+            Coordinate coord = mine.getCoord();
+            if (!revealedMines.contains(coord)) {
+                revealedMines.add(coord);
+                return Optional.of(coord);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Возвращает количество активных (не выданных) мин.
+     */
+    public int getActiveMinesCount() {
+        return (int) mines.stream()
+                .filter(mine -> !revealedMines.contains(mine.getCoord()))
+                .count();
     }
 }

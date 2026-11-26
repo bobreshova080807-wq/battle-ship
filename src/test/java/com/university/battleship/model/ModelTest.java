@@ -1,7 +1,10 @@
 package com.university.battleship.model;
 
+import com.university.battleship.rules.PlacementRules;
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -27,7 +30,12 @@ class ModelTest {
     @Test
     void coordinate_outOfBounds_throwsException() {
         assertThrows(IllegalArgumentException.class, () -> new Coordinate(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> new Coordinate(10, 0));
+        assertThrows(IllegalArgumentException.class, () -> new Coordinate(0, -1));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new Coordinate(Coordinate.BOARD_SIZE, 0));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Coordinate(0, Coordinate.BOARD_SIZE));
     }
 
     @Test
@@ -122,5 +130,55 @@ class ModelTest {
         assertTrue(ShipType.SUBMARINE.isSubmarine());
         assertTrue(ShipType.MINESWEEPER.isMinesweeper());
         assertFalse(ShipType.BOAT.isSubmarine());
+    }
+
+    @Test
+    void submarine_sinksInOneHit() {
+        Ship sub = new Ship(ShipType.SUBMARINE, List.of(new Coordinate(5, 5)));
+        assertTrue(sub.hit(new Coordinate(5, 5)));  // Тонет с первого попадания
+    }
+
+    @Test
+    void submarine_canTouchOtherShips() {
+        Ship boat = new Ship(ShipType.BOAT, List.of(new Coordinate(5, 5)));
+        Ship sub = new Ship(ShipType.SUBMARINE, List.of(new Coordinate(5, 6)));
+        assertTrue(PlacementRules.canPlace(sub, List.of(boat)));
+    }
+
+    @Test
+    void minesweeper_cannotTouchShips() {
+        Ship boat = new Ship(ShipType.BOAT, List.of(new Coordinate(5, 5)));
+        Ship trawler = new Ship(ShipType.MINESWEEPER,
+                List.of(new Coordinate(5, 6), new Coordinate(5, 7)));
+        assertFalse(PlacementRules.canPlace(trawler, List.of(boat)));
+    }
+
+    @Test
+    void fleet_revealOneMine_returnsActiveMine() {
+        Mine mine1 = new Mine(new Coordinate(1, 1));
+        Mine mine2 = new Mine(new Coordinate(2, 2));
+        Fleet fleet = new Fleet(List.of(), List.of(mine1, mine2));
+
+        Optional<Coordinate> revealed = fleet.revealOneMine();
+        assertTrue(revealed.isPresent());
+        assertTrue(revealed.get().equals(new Coordinate(1, 1))
+                || revealed.get().equals(new Coordinate(2, 2)));
+
+        // Вторая мина ещё активна
+        assertEquals(1, fleet.getActiveMinesCount());
+    }
+
+    @Test
+    void fleet_revealOneMine_returnsEmptyWhenNoMines() {
+        Fleet fleet = new Fleet(List.of(), List.of());
+        assertTrue(fleet.revealOneMine().isEmpty());
+    }
+
+    @Test
+    void knowledge_knownMine_isShotReturnsTrue() {
+        Knowledge k = new Knowledge();
+        Coordinate coord = new Coordinate(5, 5);
+        k.update(coord, CellState.KNOWN_MINE);
+        assertTrue(k.isShot(coord));  // Стратегия не должна стрелять сюда
     }
 }

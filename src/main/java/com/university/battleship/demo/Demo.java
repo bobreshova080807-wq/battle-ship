@@ -68,7 +68,7 @@ public class Demo {
 
         System.out.println("НАЧАЛО ИГРЫ:");
 
-        while (true){
+        while (true) {
             turn++;
             System.out.println("Ход " + turn + ": " + current.name());
 
@@ -76,7 +76,7 @@ public class Demo {
 
             List<GameEvent> events = gameService.applyShot(current, opponent, shot);
 
-            for (GameEvent event: events){
+            for (GameEvent event : events) {
                 System.out.println(" " + event.describe());
             }
             System.out.println();
@@ -106,8 +106,52 @@ public class Demo {
             System.out.println("Всего было ходов: " + turn);
             System.out.println("Всего было выстрелов: " + allShots);
             break;
-
         }
+
+        System.out.println("\n=== ДЕМО ПОДВОДНОЙ ЛОДКИ ===\n");
+
+        Ship submarine = new Ship(ShipType.SUBMARINE, List.of(new Coordinate(5, 5)));
+        Ship boat = new Ship(ShipType.BOAT, List.of(new Coordinate(5, 6)));  // Рядом с подлодкой!
+        Fleet demoFleet = new Fleet(List.of(submarine, boat), List.of());
+        Player demoPlayer = new Player("Подводник", demoFleet, new Board(demoFleet), new Knowledge());
+
+// У охотника корабль в клетке (5, 5) — туда подлодка и выстрелит
+        Ship hunterShip = new Ship(ShipType.BOAT, List.of(new Coordinate(5, 5)));
+        Fleet hunterFleet = new Fleet(List.of(hunterShip), List.of());
+        Player hunter = new Player("Охотник", hunterFleet, new Board(hunterFleet), new Knowledge());
+
+        System.out.println("Подлодка может касаться кораблей (катер стоит в (5,6))");
+        System.out.println("Охотник стреляет в (5,5) — попадает в подлодку\n");
+
+        List<GameEvent> eventsSubmarine = gameService.applyShot(hunter, demoPlayer, new Coordinate(5, 5));
+        for (GameEvent event : eventsSubmarine) {
+            System.out.println("  " + event.describe());
+        }
+        System.out.println("Корабль охотника потоплен: " + hunterShip.isSunk());
+
+        System.out.println("\n=== ДЕМО МИННОГО ТРАЛЬЩИКА ===\n");
+
+        Ship trawler = new Ship(ShipType.MINESWEEPER,
+                List.of(new Coordinate(3, 3), new Coordinate(3, 4)));
+        Mine shooterMine = new Mine(new Coordinate(7, 7));
+        Fleet trawlerFleet = new Fleet(List.of(trawler), List.of());
+        Fleet shooterFleet2 = new Fleet(
+                List.of(new Ship(ShipType.BOAT, List.of(new Coordinate(0, 0)))),
+                List.of(shooterMine)
+        );
+
+        Player trawlerOwner = new Player("Тральщик", trawlerFleet, new Board(trawlerFleet), new Knowledge());
+        Player mineOwner = new Player("Минёр", shooterFleet2, new Board(shooterFleet2), new Knowledge());
+
+        System.out.println("Минёр стреляет в тральщик — вынужден выдать координату своей мины\n");
+
+        List<GameEvent> events2 = gameService.applyShot(mineOwner, trawlerOwner, new Coordinate(3, 3));
+        for (GameEvent event : events2) {
+            System.out.println("  " + event.describe());
+        }
+        System.out.println("Тральщик знает о мине: "
+                + (trawlerOwner.knowledge().getState(new Coordinate(7, 7)) == CellState.KNOWN_MINE));
 
     }
 }
+

@@ -69,9 +69,11 @@ public final class Knowledge {
      * @param coord координата клетки
      * @return true, если клетка уже обстреляна
      */
-    public boolean isShot(Coordinate coord){
+    public boolean isShot(Coordinate coord) {
         CellState state = getState(coord);
-        return state == CellState.MISS || state == CellState.HIT ||
-                state == CellState.SUNK || state == CellState.MINE_EXPLODED;
+        return state == CellState.MISS || state == CellState.HIT
+                || state == CellState.SUNK || state == CellState.MINE_EXPLODED
+                || state == CellState.KNOWN_MINE;
     }
+
 }

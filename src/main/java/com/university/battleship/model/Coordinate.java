@@ -15,7 +15,7 @@ import java.util.List;
  */
 public record Coordinate(int row, int col) {
     /** Размер поля (10×10). */
-    public static final int BOARD_SIZE = 10;
+    public static final int BOARD_SIZE = 15;
 
     /**
      * Компактный конструктор с валидацией координат.

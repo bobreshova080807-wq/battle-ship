@@ -22,7 +22,7 @@ class GameServiceTest {
     /**
      * Подготовка тестового окружения перед каждым тестом.
      *
-     * <p>Создаёт два игрока с случайными флотами (3 мины у каждого)
+     * <p>Создаёт два игрока со случайными флотами (3 мины у каждого)
      * и сервис игры. Использует фиксированное зерно Random(42)
      * для воспроизводимости результатов.
      *
@@ -43,7 +43,6 @@ class GameServiceTest {
 
     @Test
     void applyShot_miss_returnsMissEvent() {
-        // Создаём корабль в стороне от места выстрела
         Ship ship = new Ship(ShipType.BOAT, List.of(new Coordinate(9, 9)));
         Fleet fleet = new Fleet(List.of(ship), List.of());
 
@@ -63,7 +62,6 @@ class GameServiceTest {
 
     @Test
     void applyShot_hit_returnsHitEvent() {
-        // Создаём корабль из 2 клеток (DESTROYER)
         Ship ship = new Ship(ShipType.DESTROYER,
                 List.of(new Coordinate(5, 5), new Coordinate(5, 6)));
         Fleet fleet = new Fleet(List.of(ship), List.of());
@@ -110,22 +108,6 @@ class GameServiceTest {
 
         assertTrue(events.stream()
                 .anyMatch(e -> e instanceof MineExplodedEvent));
-    }
-
-    @Test
-    void applyShot_submarine_returnsSubmarineMissed() {
-        Ship sub = new Ship(ShipType.SUBMARINE, List.of(new Coordinate(4, 4)));
-        Fleet fleet = new Fleet(List.of(sub), List.of());
-
-        Player shooter = new Player("S", new Fleet(List.of(), List.of()),
-                new Board(new Fleet(List.of(), List.of())), new Knowledge());
-        Player victim = new Player("V", fleet, new Board(fleet), new Knowledge());
-
-        List<GameEvent> events = gameService.applyShot(shooter, victim, new Coordinate(4, 4));
-
-        assertTrue(events.stream()
-                .filter(e -> e instanceof ShotEvent se)
-                .anyMatch(e -> ((ShotEvent) e).shotResult() == ShotResult.SUBMARINE_MISSED));
     }
 
     @Test
@@ -182,6 +164,74 @@ class GameServiceTest {
                 .orElseThrow();
 
         assertTrue(mineEvent.hurtShips().size() >= 1);
+    }
+
+    @Test
+    void applyShot_submarine_sinksAndCounterShots() {
+        Ship sub = new Ship(ShipType.SUBMARINE, List.of(new Coordinate(5, 5)));
+        Fleet victimFleet = new Fleet(List.of(sub), List.of());
+
+        // У стреляющего есть корабль в клетке (5, 5) — туда подлодка и выстрелит
+        Ship shooterShip = new Ship(ShipType.BOAT, List.of(new Coordinate(5, 5)));
+        Fleet shooterFleet = new Fleet(List.of(shooterShip), List.of());
+
+        Player shooter = new Player("S", shooterFleet, new Board(shooterFleet), new Knowledge());
+        Player victim = new Player("V", victimFleet, new Board(victimFleet), new Knowledge());
+
+        List<GameEvent> events = gameService.applyShot(shooter, victim, new Coordinate(5, 5));
+
+        // Должно быть: ShipSunkEvent (подлодка), SubmarineCounterShotEvent, ShotEvent
+        assertTrue(events.stream().anyMatch(e -> e instanceof ShipSunkEvent));
+        assertTrue(events.stream().anyMatch(e -> e instanceof SubmarineCounterShotEvent));
+
+        // Подлодка должна была попасть в корабль стреляющего
+        assertTrue(shooterShip.isSunk());
+    }
+
+    @Test
+    void applyShot_minesweeper_revealsMine() {
+        Ship trawler = new Ship(ShipType.MINESWEEPER,
+                List.of(new Coordinate(5, 5), new Coordinate(5, 6)));
+        Mine shooterMine = new Mine(new Coordinate(3, 3));
+
+        Fleet victimFleet = new Fleet(List.of(trawler), List.of());
+        Fleet shooterFleet = new Fleet(
+                List.of(new Ship(ShipType.BOAT, List.of(new Coordinate(0, 9)))),
+                List.of(shooterMine)
+        );
+
+        Player shooter = new Player("S", shooterFleet, new Board(shooterFleet), new Knowledge());
+        Player victim = new Player("V", victimFleet, new Board(victimFleet), new Knowledge());
+
+        List<GameEvent> events = gameService.applyShot(shooter, victim, new Coordinate(5, 5));
+
+        // Должно быть событие выдачи мины
+        assertTrue(events.stream().anyMatch(e -> e instanceof MineRevealedEvent));
+
+        // Противник должен знать о мине
+        assertEquals(CellState.KNOWN_MINE, victim.knowledge().getState(new Coordinate(3, 3)));
+    }
+
+    @Test
+    void applyShot_minesweeper_noMines_noReveal() {
+        Ship trawler = new Ship(ShipType.MINESWEEPER,
+                List.of(new Coordinate(5, 5), new Coordinate(5, 6)));
+
+        Fleet victimFleet = new Fleet(List.of(trawler), List.of());
+        Fleet shooterFleet = new Fleet(
+                List.of(new Ship(ShipType.BOAT, List.of(new Coordinate(0, 9)))),
+                List.of()  // Нет мин!
+        );
+
+        Player shooter = new Player("S", shooterFleet, new Board(shooterFleet), new Knowledge());
+        Player victim = new Player("V", victimFleet, new Board(victimFleet), new Knowledge());
+
+        List<GameEvent> events = gameService.applyShot(shooter, victim, new Coordinate(5, 5));
+
+        // Должно быть событие "нет мин"
+        assertTrue(events.stream().anyMatch(e -> e instanceof MinesweeperNoMinesEvent));
+        // Не должно быть MineRevealedEvent
+        assertFalse(events.stream().anyMatch(e -> e instanceof MineRevealedEvent));
     }
 
 }

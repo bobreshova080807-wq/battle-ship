@@ -13,7 +13,8 @@ import com.university.battleship.model.ShipType;
  * <p>Запечатанный интерфейс: разрешены только 4 реализации:
  * {@link ShotEvent}, {@link ShipSunkEvent}, {@link MineExplodedEvent}, {@link GameOverEvent}.
  */
-public sealed interface GameEvent permits ShotEvent, ShipSunkEvent, MineExplodedEvent, GameOverEvent{
+public sealed interface GameEvent permits ShotEvent, ShipSunkEvent, MineExplodedEvent,
+        GameOverEvent, SubmarineCounterShotEvent, MineRevealedEvent, MinesweeperNoMinesEvent{
     /**
      * Возвращает имя игрока, которому адресовано событие.
      *

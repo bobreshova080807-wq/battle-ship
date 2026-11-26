@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public final class CheckerBoardStrategy implements ShotStrategy {
     private final Random random;
-    private boolean evenPhase = true;
+    private boolean evenPhase = true; //TODO:доделать
 
     /**
      * Создаёт стратегию с заданным генератором случайных чисел.

@@ -29,6 +29,8 @@ public record ShotEvent(String playerName, Coordinate coord, ShotResult shotResu
             case ALREADY_SHOT -> playerName + " стреляет в " + coord + " - Сюда уже стреляли.";
             case SUBMARINE_MISSED -> playerName + " стреляет в " + coord + " - Промах";
             case CLEARED ->  playerName + " стреляет в " + coord + " - Мина успешна обезврежена!";
+            case SUBMARINE_HIT -> playerName + " стреляет в " + coord + " — ПОДЛОДКА! Она тонет и стреляет в ответ!";
+            case MINESWEEPER_HIT -> playerName + " стреляет в " + coord + " — МИННЫЙ ТРАЛЬЩИК! Вы выдаёте координату мины противнику";
         };
     }
 }

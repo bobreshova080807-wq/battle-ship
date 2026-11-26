@@ -27,6 +27,12 @@ public enum ShotResult {
     SUBMARINE_MISSED,
 
     /** Тральщик обезвредил мину */
-    CLEARED
+    CLEARED,
+
+    /** Попадание в подлодку — она тонет и стреляет в ответ */
+    SUBMARINE_HIT,
+
+    /** Попадание в тральщик — стреляющий выдаёт координату мины */
+    MINESWEEPER_HIT
 
 }
